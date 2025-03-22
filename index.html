@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="DHO is an integrated method to reconstruct and understand dynamic scenes.">
+  <meta name="keywords" content="DHO, Semantics, Segmentation, 4D Gaussians Splatting">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <meta property="og:title" content="Divide-and-Conquer: The Dual-Hierarchical Optimization for Semantic 4D Gaussians"/>
+
+
+  <meta name="twitter:title" content="Divide-and-Conquer: The Dual-Hierarchical Optimization for Semantic 4D Gaussians">
+  <meta name="twitter:description" content="DHO is an integrated method to reconstruct and understand dynamic scenes.">
+
+  <meta name="twitter:card" content="summary_large_image">
+ 
+  
+  <title>Divide-and-Conquer: Dual-Hierarchical Optimization for Semantic 4D Gaussian Splatting</title>
+
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/video_comparison.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+
+<body>
+
+<!-- <section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Divide-and-Conquer: The Dual-Hierarchical Optimization for Semantic 4D Gaussian Splatting</h1>
+           -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Divide-and-Conquer: The Dual-Hierarchical Optimization for Semantic 4D Gaussian Splatting</h1>
+
+
+          <!-- Paper Authors -->
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              Zhiying Yan<sup>1,2,*</sup>,</span>
+            <span class="author-block">
+              Yiyuan Liang<sup>1,2,*</sup>,</span>
+            <span class="author-block">
+              Shilv Cai<sup>3</sup>,</span>
+            <span class="author-block">
+              Tao Zhang<sup>1,2</sup>,</span><br>
+              <span class="author-block">
+                Sheng Zhong<sup>1,2</sup>,</span>
+            <span class="author-block">
+              Luxin Yan<sup>1,2</sup>,</span>
+            <span class="author-block">
+              Xu Zou<sup>1,2,†</sup></span>
+          </div>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <sup>1</sup>Huazhong University of Science and Technology<br>
+              <sup>2</sup>National Key Laboratory of Multispectral Information Intelligent Processing Technology<br>
+              <sup>3</sup>Nanyang Technological University, Singapore<br>
+            </span>
+            <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution,<sup>†</sup>Indicates
+                Corresponding Author</small></span><br>
+          </div>
+          <div class="is-size-3 has-text-weight-bold">ICME 2025</div>
+          <!-- End of Institutions -->
+
+          <!-- Publication Links -->
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- Paper link -->
+              <span class="link-block">
+                <a href="" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- End of Paper Link 
+
+              <!-- arXiv abstract Link -->
+              <span class="link-block">
+                <a href="" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- End of arXiv abstract Link -->
+
+              <!-- Code Link -->
+              <span class="link-block">
+                <a href=""
+                    class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+              </span>
+              <!-- End of Code Link -->
+            </div>
+          </div>
+          <!-- End of Publication Links -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+          
+
+
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+      
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item item-lamp-positive">
+          <video poster="" id="lamp-positive" autoplay muted loop playsinline height="100%">
+              <source src="../Videos/segment_hypernerf/americano.mp4" type="video/mp4">
+          </video>
+          <p class="has-text-centered">Seg "Cup"</p>
+        </div>
+        <div class="item item-bike-positive">
+          <video poster="" id="bike-positive" autoplay muted loop playsinline height="100%">
+              <source src="../Videos/segment_hypernerf/oven-mitts.mp4" type="video/mp4">
+          </video>
+          <p class="has-text-centered">Seg "Mitts"</p>
+        </div>
+        <div class="item item-alien-positive">
+          <video poster="" id="alien-positive" autoplay muted loop playsinline height="100%">
+              <source src="../Videos/segment_hypernerf/cookie.mp4" type="video/mp4">
+          </video>
+          <p class="has-text-centered">Seg "Cookie"</p>
+        </div>
+        <div class="item item-camel-positive">
+          <video poster="" id="camel-positive" autoplay muted loop playsinline height="100%">
+              <source src="../Videos/segment_hypernerf/chick.mp4" type="video/mp4">
+          </video>
+          <p class="has-text-centered">Seg "Toy"</p>
+        </div>
+        <div class="item item-hammer-positive-negative">
+            <video poster="" id="hammer-positive-negative" autoplay muted loop playsinline height="100%">
+                <source src="../Videos/segment_hypernerf/chocolate.mp4" type="video/mp4">
+            </video>
+            <p class="has-text-centered">Seg "Chocolate"</p>
+        </div>
+        <div class="item item-new-video">
+          <video poster="" id="new-video" autoplay muted loop playsinline height="100%">
+              <source src="../Videos/segment_hypernerf/broom.mp4" type="video/mp4">
+          </video>
+          <p class="has-text-centered">Seg "Broom"</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <h2 class="subtitle has-text-centered">
+          <br>
+          </b> Our method is dedicated to achieving high-quality rendering novel views and accurate semantic understanding of dynamic scenes, 
+          while providing support for downstream tasks in 4D scenarios.
+      </h2>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Semantic 4D Gaussians can be used for reconstructing and understanding dynamic scenes captured from a monocular camera, resulting in better handling of object information with temporal variations than static scenes. 
+            However, most recent works focus on the semantics of static scenes. Directly applying them to understand dynamic scenes is impractical, which fails to capture the temporal behaviors and features of dynamic objects. 
+            To the best of our knowledge, few existing 3DGS-based methods emphasize the semantic comprehension of dynamic scenes. While demonstrating promising capabilities in simple scenes, 
+            it struggles to achieve high-fidelity rendering and accurate semantic features in scenarios where the static background contains significant noise and the dynamic foreground exhibits substantial deformation with intricate textures. 
+            Because the same update strategy is employed for both dynamic and static parts, regardless of the distinction and interaction between their corresponding Gaussians, 
+            which leads to artifacts and noise especially at the boundaries between the semantic masks of dynamic foreground and static background. To address these limitations, we propose the Dual-Hierarchical Optimization (DHO), 
+            which consists of Hierarchical Gaussian Flow and Hierarchical Gaussian Guidance in a divide-and-conquer manner. The former implements effective division of static and dynamic rendering and their features. 
+            The latter helps conquer the issue of dynamic foreground rendering distortion in scenes where the static background has complex noise (e.g., the “Broom’’ scene in HyperNeRF dataset). 
+            Extensive experiments show that our method consistently outperforms baselines on both synthetic and real-world datasets. 
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ end of Abstract -->
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Method Overview-->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <hr class="divider" />
+        <h2 class="title is-3">Method Overview</h2>
+        <div class="content has-text-justified">
+          <p>
+            The overall pipeline of our model. We add semantic properties to each Gaussian and obtain the geometric deformation of the Gaussian at each timestamp t through the deformation field. 
+            In the coarse stage, Gaussians are subjected to geometric constraints. While in the fine stage, geometries are relaxed and semantic feature constraints are introduced, 
+            ensuring foreground-background separation. We utilize dynamic foreground masks obtained from scene priors for hierarchical Gaussian guidance of the scene, 
+            enhancing the rendering quality of dynamic foregrounds with complex backgrounds.
+          </p>
+        </div>
+        <div class="two-col-image">
+          <img src="./static/images/pipeline.png" type="image/png">
+        </div>
+      </div>
+    </div>
+    <!-- End of Method Overview-->
+    
+    
+    
+    
+    <!-- Results -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <hr class="divider" />
+        <h2 class="title is-3">Visual Results</h2>
+        <div class="content has-text-justified">
+          <p>
+            The following results show the novel rendering views and the extracted semantic feature maps using our method, 
+            evaluated on both the real-world HyperNeRF dataset and the synthetic D-NeRF dataset. The visualization of the feature maps is displayed using PCA for dimension reduction.
+            <table width="200" border="0" align="center">
+            <tbody>
+
+              <tr>
+                <td align="center">
+                    <video width="200" autoplay muted playsinline loop>
+                        <source src="../Videos/renders/cookie.mp4" type="video/mp4" />
+                    </video>
+                </td>
+                 <td align="center"><video width="200" autoplay muted playsinline loop>
+                    <source src="../Videos/renders/chick.mp4" type="video/mp4" />
+                </video></td>
+                   <td align="center"><video width="200" autoplay muted playsinline loop>
+                    <source src="../Videos/renders/americano.mp4" type="video/mp4" />
+                </video></td>
+                           <td align="center"><video width="200" autoplay muted playsinline loop>
+                    <source src="../Videos/renders/torchocolate.mp4" type="video/mp4" />
+                </video></td>
+        </tr>
+              <tr>
+                <td align="center">Split-Cookie</td>
+                <td align="center">ChickChicken</td>
+                <td align="center">Americano</td>
+                <td align="center">Torchocolate</td>
+              </tr>
+                </tr>
+            </tbody>
+          </table>
+            <p>
+            
+        <table width="200" border="0" align="center">
+            <tbody>
+              <tr>
+                <td align="center"><video width="400" autoplay muted playsinline loop>
+                    <source src="../Videos/renders/jumpingjacks.mp4" type="video/mp4" />
+                </video></td>
+                 <td align="center"><video width="400" autoplay muted playsinline loop>
+                  <source src="../Videos/renders/standup.mp4" type="video/mp4" />
+                </video></td>
+                   <td align="center"><video width="400" autoplay muted playsinline loop>
+                    <source src="../Videos/renders/trex.mp4" type="video/mp4" />
+                </video></td>
+                    <td align="center"><video width="400" autoplay muted playsinline loop>
+                    <source src="../Videos/renders/hook.mp4" type="video/mp4" />
+                </video></td>
+              </tr>
+              <tr>
+                  
+                <td align="center" width=250>Jumpingjacks</td>
+                <td align="center" width=250>Standup</td>
+                <td align="center" width=250>Trex</td>
+                <td align="center" width=250>Hook</td>
+              </tr>
+<!--                </tr>-->
+            </tbody>
+          </table>
+          </p>
+        </div>
+      </div>
+    </div>
+    <!-- End of Results -->
+
+   
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <hr class="divider" />
+        <h2 class="title is-3">Segmentation on Synthetic Dataset</h2>
+        <div class="content has-text-justified">
+          <p>
+            Our method achieves excellent semantic segmentation performance not only on real-world datasets but also on synthetic datasets.
+          </p>
+        </div>
+      </div>
+    </div>
+  
+    <section class="hero is-light is-small">
+      <div class="hero-body">
+        <div class="container">
+          <div id="results-carousel" class="carousel results-carousel">
+            <div class="item item-lamp-positive">
+              <video poster="" id="lamp-positive" autoplay muted loop playsinline height="100%">
+                  <source src="../Videos/segment_dnerf/jumpingjacks-jacket.mp4" type="video/mp4">
+              </video>
+              <p class="has-text-centered">Seg "Jacket"</p>
+            </div>
+            <div class="item item-bike-positive">
+              <video poster="" id="bike-positive" autoplay muted loop playsinline height="100%">
+                  <source src="../Videos/segment_dnerf/standup_helmet.mp4" type="video/mp4">
+              </video>
+              <p class="has-text-centered">Seg "Helmet"</p>
+            </div>
+            <div class="item item-alien-positive">
+              <video poster="" id="alien-positive" autoplay muted loop playsinline height="100%">
+                  <source src="../Videos/segment_dnerf/trex_skull.mp4" type="video/mp4">
+              </video>
+              <p class="has-text-centered">Seg "Skull"</p>
+            </div>
+            <div class="item item-camel-positive">
+              <video poster="" id="camel-positive" autoplay muted loop playsinline height="100%">
+                  <source src="../Videos/segment_dnerf/lego-shovels.mp4" type="video/mp4">
+              </video>
+              <p class="has-text-centered">Seg "Shovels"</p>
+            </div>
+            <div class="item item-hammer-positive-negative">
+                <video poster="" id="hammer-positive-negative" autoplay muted loop playsinline height="100%">
+                    <source src="../Videos/segment_dnerf/hook-hands.mp4" type="video/mp4">
+                </video>
+                <p class="has-text-centered">Seg "Hands"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+    
+    
+    
+    
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <hr class="divider" />
+        <h2 class="title is-3">Comparison with Baseline</h2>
+        <div class="content has-text-justified">
+          <p>
+            Our method outperforms the baseline in terms of rendering quality, semantic feature completeness, and semantic segmentation accuracy.
+            (Our method is on the left, Baseline is on the right)
+          </p>
+        </div>
+      </div> 
+    </div> 
+    
+    <video width="1000" height="536" autoplay muted loop playsinline>
+        <source src="../Videos/compare/compare_baseline.mp4" type="video/mp4">
+    </video>
+
+  <div class="columns is-centered">
+    <div class="column is-full-width">
+      <hr class="divider" />
+      <h2 class="title is-3">Multi-Scale Semantic Feature and Segmentation</h2>
+      <div class="content has-text-justified">
+        Visualization results of multi-scale dynamic semantic segmentation . </p>
+          <table width="200" border="0" align="center">
+              <tbody>
+                      <tr>
+                  <td align="center">Multi-Scale "Chickchicken"</td>
+                  <td></td>
+                  <td align="center">Multi-Scale "Broom"</td>
+              </tr>
+              <tr>
+                  <td align="center"><video width="350" controls="controls" autoplay muted playsinline loop>
+                      <source src="../Videos/scales/chick.mp4" type="video/mp4" />
+                  </video></td>
+                  <td align="center"><video width="10">
+                  <td align="center"><video width="350" controls="controls" autoplay muted playsinline loop>
+                      <source src="../Videos/scales/broom.mp4" type="video/mp4" />
+                  </video></td>
+              </tr>
+    
+              </tr>
+              </tbody>
+          </table>
+            
+<!-- Results -->
+<div class="columns is-centered">
+  <div class="column is-full-width">
+    <hr class="divider" />
+    <h2 class="title is-3">Semantic Editing</h2>
+    <div class="content has-text-justified">
+        Visual illustration of our method’s ability to semantically edit objects. </p>
+        <table width="200" border="0" align="center">
+            <tbody>
+            <tr>
+                <td align="center">Remove "Cookie"</td>
+                <td></td>
+                <td align="center">Turn "Cookie" into "Pizza"</td>
+            </tr>
+            <tr>
+                <td align="center"><video width="435" controls="controls" autoplay muted playsinline loop>
+                    <source src="../Videos/remove/remove_cookie.mp4" type="video/mp4" />
+                </video></td>
+                <td align="center"><video width="10">
+                <td align="center"><video width="435" controls="controls" autoplay muted playsinline loop>
+                    <source src="../Videos/remove/edit_pizza.mp4" type="video/mp4" />
+                </video></td>
+            </tr>
+            
+      </div>
+            </tr>
+            </tbody>
+        </table>
+   
+
+</body>
+</html>
